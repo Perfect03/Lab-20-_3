@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include <QSplitter>
 #include <QListView>
 #include <QTreeView>
@@ -47,6 +47,16 @@ MainWindow::MainWindow(QWidget *parent)
 
 	QModelIndex indexHomePath = dirModel->index(homePath);
 	QFileInfo fileInfo = dirModel->fileInfo(indexHomePath);
+
+	combobox = new QComboBox(this);
+    	btnPrint = new QPushButton("Печать графика", this);
+	checkbox = new QCheckBox("Чёрно-белый график", this);
+
+	QVBoxLayout *layout = new QVBoxLayout();
+
+	layout->addWidget(combobox);
+	layout->addWidget(btnPrint);
+	layout->addWidget(checkbox);
 
 	/* Рассмотрим способы обхода содержимого папок на диске.
 	 * Предлагается вариант решения, которы может быть применен для более сложных задач.

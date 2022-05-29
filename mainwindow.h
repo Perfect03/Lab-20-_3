@@ -6,6 +6,9 @@
 #include <QFileSystemModel>
 #include <QTreeView>
 #include <QTableView>
+#include <QPushButton>
+#include <QCheckBox>
+#include <QComboBox>
 
 class MainWindow : public QMainWindow
 {
@@ -22,6 +25,9 @@ private:
 	QFileSystemModel *dirModel;
 	QTreeView *treeView;
 	QTableView *tableView;
+	QPushButton *btnPrint;
+	QCheckBox *checkbox;
+	QComboBox *combobox;
 };
 
 #endif // MAINWINDOW_H
