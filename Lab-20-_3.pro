@@ -25,9 +25,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp \
+	mainwindow.cpp \
     fileexplorermodel.cpp
 
 HEADERS += \
+    fileexplorermodel.h \
         mainwindow.h \
     fileexplorermodel.h
