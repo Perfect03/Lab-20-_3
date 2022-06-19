@@ -14,6 +14,8 @@
 #include <QMessageBox>
 #include "themewidget.h"
 #include <QSplitter>
+#include <QPdfWriter>
+#include <QFileDialog>
 
 class MainWindow : public QWidget//
 {
@@ -22,16 +24,21 @@ private slots:
 
     void on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
     void on_select_comboboxOnChangedSlot(const int index);
+    void on_print_chart_slot();
+    void on_select_dir_slot();
 
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 private:
+    QString homePath;
+    QString homePathSavePdf;
     QFileSystemModel *fileModel;
     QFileSystemModel *dirModel;
     QTreeView *treeView;
     QTableView *tableView;
     QPushButton *btnPrint;
+    QPushButton *selectDir;
     QCheckBox *checkbox;
     QComboBox *combobox;
     QLabel *label, *label_path;
@@ -39,6 +46,7 @@ private:
     QChartView *chartView;
     QChart *chartBar;
     QSplitter *splitter;
+
 };
 
 #endif // MAINWINDOW_H

@@ -34,23 +34,23 @@
 #include <QtWidgets/QLabel>
 #include <QtCore/QTime>
 #include <QtCharts/QBarCategoryAxis>
+#include <QCoreApplication>
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
       //QMainWindow(parent)
 {
-    themeWidget = new ThemeWidget();
     //Устанавливаем размер главного окна
     //this->resize(1500,500);
     //this->setGeometry(100, 100, 1500, 500);
     setWindowTitle("Laba3"); // заголовк окна
     resize(1500, 500); // стандартный размер
     //this->setStatusBar(new QStatusBar(this));
-
-
-
     //this->statusBar()->showMessage("Choosen Path: ");
-    QString homePath = QDir::homePath();
+
+    //homePath = QDir::homePath() + "/Desktop/Solomin_Dmitrii_931920_Lab20_3/InputData";
+    homePath = QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + "/InputData";
+    //homePath = QCoreApplication::applicationDirPath();
     // Определим  файловой системы:
     dirModel =  new QFileSystemModel(this);
     dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
@@ -61,76 +61,83 @@ MainWindow::MainWindow(QWidget *parent)
     fileModel->setRootPath(homePath);
 
 
-
-
     //Показать как дерево, пользуясь готовым видом:
+
+
     label_path = new QLabel("Choosen Path: ");
+    label_path->setText(homePath);
 
-    label = new QLabel("Выберите тип диаграммы:");
+    label = new QLabel("Выберите тип диаграммы");
 
-    combobox = new QComboBox();
+    combobox = new QComboBox();//выбор графика
     //combobox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
-    btnPrint = new QPushButton("Печать графика");
+    btnPrint = new QPushButton("Печать графика"); //кнопка печати графика
     //btnPrint->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
-    checkbox = new QCheckBox("Черно-белый график");
+    checkbox = new QCheckBox("Черно-белый график"); // выбор цвета графика
     //checkbox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+
+    selectDir = new QPushButton("Выбор папки");
+    //selectDir->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
     QHBoxLayout *layout = new QHBoxLayout();
     layout->addWidget(label);
     layout->addWidget(combobox);
     layout->addWidget(checkbox);
     layout->addWidget(btnPrint);
+    layout->addWidget(selectDir);
     //layout->addStretch();
     layout->setAlignment(Qt::AlignCenter);
     //setLayout(layout);
 
-     splitter = new QSplitter(parent);
+    splitter = new QSplitter(parent);
 
     splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // заполнять всё доступное пространство по вертикали
 
-
-
-
-
-
+    themeWidget = new ThemeWidget();
 
     treeView = new QTreeView(splitter);
     treeView->setModel(dirModel);
-
     treeView->expandAll();
 
-    tableView = new QTableView();
+    tableView = new QTableView(splitter);
     tableView->setModel(fileModel);
 
     treeView->setHeaderHidden(true); // скрываем заголовок дерева
     treeView->hideColumn(1); // также выключаем ненужные столбцы
-    treeView->hideColumn(2);
-    treeView->hideColumn(3);
 
     //1.Добавление диаграммы
-    // chartBar =  themeWidget->createPieChart();
-    // chartView = new QChartView(chartBar);
-    // splitter->addWidget(chartView);
 
+    //chartBar =  themeWidget->createPieChart();
+   // chartView = new QChartView(chartBar);
+
+    //splitter->addWidget(chartView);
+    //setCentralWidget(splitter);
     splitter->setStretchFactor(0, 1); // устанавливаем начальное положение разделителя
     splitter->setStretchFactor(1, 2);
+
+    //splitter->addWidget(treeView);
+    //splitter->addWidget(chartView);
+    //splitter->addWidget(tableView);
+    //setCentralWidget(splitter);
+
 
     QVBoxLayout *layout_vertical = new QVBoxLayout(this);
     layout_vertical->addLayout(layout);
     layout_vertical->addWidget(splitter);
     layout_vertical->addWidget(label_path);
+    //layout_vertical->addStretch();
+    //setLayout(layout_vertical);
 
-    QItemSelectionModel *selectionModel = treeView->selectionModel();
-    QModelIndex rootIx = dirModel->index(0, 0, QModelIndex());//корневой элемент
+    QItemSelectionModel *selectionModel = tableView->selectionModel();
+    QModelIndex rootIx = fileModel->index(0, 0, QModelIndex());//корневой элемент
 
-    QModelIndex indexHomePath = dirModel->index(homePath);
-    QFileInfo fileInfo = dirModel->fileInfo(indexHomePath);
+    QModelIndex indexHomePath = fileModel->index(homePath);
+    QFileInfo fileInfo = fileModel->fileInfo(indexHomePath);
 
-    connect(combobox, &QComboBox::currentIndexChanged, this, &MainWindow::on_select_comboboxOnChangedSlot);
-    combobox->addItem("Bar chart");
-    combobox->addItem("Pie chart");
+    combobox->addItem("Bar Chart");
+    combobox->addItem("Pie Chart");
 
     /* Рассмотрим способы обхода содержимого папок на диске.
      * Предлагается вариант решения, которы может быть применен для более сложных задач.
@@ -138,7 +145,7 @@ MainWindow::MainWindow(QWidget *parent)
      * Например:*/
     if (fileInfo.isDir()) {
         /*
-         * Если fileInfo папка то заходим в нее, что бы просмотреть находящиеся в ней файлы.
+         * Если fileInfo папка то заходим в нее, чтобы просмотреть находящиеся в ней файлы.
          * Если нужно просмотреть все файлы, включая все вложенные папки, то нужно организовать рекурсивный обход.
         */
         QDir dir  = fileInfo.dir();
@@ -152,7 +159,7 @@ MainWindow::MainWindow(QWidget *parent)
                 qDebug() << inf.fileName() << "---" << inf.size();
             }
 
-            dir.cdUp();//выходим из папки
+            dir.cdUp();// выходим из папки
         }
     }
 
@@ -164,27 +171,61 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
 
-    treeView->header()->resizeSection(0, 200);
-    //Выполняем соединения слота и сигнала который вызывается когда осуществляется выбор элемента в TreeView
-    connect(selectionModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
-            this, SLOT(on_selectionChangedSlot(const QItemSelection &, const QItemSelection &)));
-    //Пример организации установки курсора в TreeView относит ельно модельного индекса
+    //tableView->header()->resizeSection(0, 200);
+    //Выполнение соединения слота и сигнала при выборе элемента в TreeView
+    connect(selectionModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_selectionChangedSlot(const QItemSelection &, const QItemSelection &)));
+    connect(combobox, &QComboBox::currentIndexChanged, this, &MainWindow::on_select_comboboxOnChangedSlot);// выбор графика
+    connect (btnPrint, SIGNAL(clicked()), this, SLOT(on_print_chart_slot())); //печать графика
+    connect (selectDir, SIGNAL(clicked()), this, SLOT(on_select_dir_slot())); //выбор папки
+
+    //Пример организации установки курсора в TableView относительно модельного индекса
     QItemSelection toggleSelection;
     QModelIndex topLeft;
-    topLeft = dirModel->index(homePath);
-    dirModel->setRootPath(homePath);
+    topLeft = fileModel->index(homePath);
+    fileModel->setRootPath(homePath);
 
     toggleSelection.select(topLeft, topLeft);
     selectionModel->select(toggleSelection, QItemSelectionModel::Toggle);
+
+    tableView->setRootIndex(fileModel->setRootPath(homePath));
 }
-//Слот для обработки выбора элемента в TreeView
-//выбор осуществляется с помощью курсора
+void MainWindow::on_select_dir_slot()
+{
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::Directory);
+    if (dialog.exec())
+        homePath = dialog.selectedFiles().first();;
+
+   tableView->setRootIndex(fileModel->setRootPath(homePath));
+}
+
+//Печать графика через QPdfWriter
+void MainWindow::on_print_chart_slot()
+{
+    QFileDialog dialog(this);
+    dialog.setFileMode(QFileDialog::Directory);
+    if (dialog.exec())
+        homePathSavePdf = dialog.selectedFiles().first();
+
+   // tableView->setRootIndex(fileModel->setRootPath(homePath));
+    QPdfWriter writer("file.pdf");
+
+    writer.setCreator("Author");// Создатель документа
+    //writer.setPageSize(QPageSize::A4);// Устанавливаем размер страницы А4
+
+    QPainter painter(&writer);
+
+    //chart_view->render(&painter);
+    painter.end();
+}
+
+//Слот для обработки выбора элемента в TableView, выбор осуществляется с помощью курсора
 
 void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected)
 {
     //Q_UNUSED(selected);
     Q_UNUSED(deselected);
-    QModelIndex index = treeView->selectionModel()->currentIndex();
+    QModelIndex index = tableView->selectionModel()->currentIndex();
     QModelIndexList indexs =  selected.indexes();
     QString filePath = "";
 
@@ -192,7 +233,7 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
 
     if (indexs.count() >= 1) {
         QModelIndex ix =  indexs.constFirst();
-        filePath = dirModel->filePath(ix);
+        filePath = fileModel->filePath(ix);
         label_path->setText(filePath);
         //this->statusBar()->showMessage("Выбранный путь : " + dirModel->filePath(indexs.constFirst()));
     }
@@ -206,19 +247,20 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
     int length = 200;
     int dx = 30;
 
-    if (dirModel->fileName(index).length() * dx > length) {
-        length = length + dirModel->fileName(index).length() * dx;
-        qDebug() << "r = " << index.row() << "c = " << index.column() << dirModel->fileName(index) << dirModel->fileInfo(
+    if (fileModel->fileName(index).length() * dx > length) {
+        length = length + fileModel->fileName(index).length() * dx;
+        qDebug() << "r = " << index.row() << "c = " << index.column() << fileModel->fileName(index) << fileModel->fileInfo(
                      index).size();
 
     }
 
-    treeView->header()->resizeSection(index.column(), length + dirModel->fileName(index).length());
-    tableView->setRootIndex(fileModel->setRootPath(filePath));
+    //tableView->header()->resizeSection(index.column(), length + dirModel->fileName(index).length());
+    treeView->setRootIndex(fileModel->setRootPath(filePath));
 }
 
 void MainWindow::on_select_comboboxOnChangedSlot(const int index)
 {
+    //splitter->deleteLater();
     try
     {
         switch (index) // получаем из выбранного индекса тип отображения
