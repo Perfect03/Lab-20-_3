@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
       //QMainWindow(parent)
 {
+    themeWidget = new ThemeWidget();
     //Устанавливаем размер главного окна
     //this->resize(1500,500);
     //this->setGeometry(100, 100, 1500, 500);
@@ -85,7 +86,7 @@ MainWindow::MainWindow(QWidget *parent)
     layout->setAlignment(Qt::AlignCenter);
     //setLayout(layout);
 
-    QSplitter *splitter = new QSplitter(parent);
+     splitter = new QSplitter(parent);
 
     splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // заполнять всё доступное пространство по вертикали
 
@@ -100,7 +101,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     treeView->expandAll();
 
-    tableView = new QTableView(splitter);
+    tableView = new QTableView();
     tableView->setModel(fileModel);
 
     treeView->setHeaderHidden(true); // скрываем заголовок дерева
@@ -109,10 +110,9 @@ MainWindow::MainWindow(QWidget *parent)
     treeView->hideColumn(3);
 
     //1.Добавление диаграммы
-    QChartView *chartView;
-    //QChart *chartBar =  themeWidget->createBarChart(5);
-    //chartView = new QChartView();
-
+    // chartBar =  themeWidget->createPieChart();
+    // chartView = new QChartView(chartBar);
+    // splitter->addWidget(chartView);
 
     splitter->setStretchFactor(0, 1); // устанавливаем начальное положение разделителя
     splitter->setStretchFactor(1, 2);
@@ -224,9 +224,15 @@ void MainWindow::on_select_comboboxOnChangedSlot(const int index)
         switch (index) // получаем из выбранного индекса тип отображения
         {
         case 0:
+            //chartBar =  themeWidget->createBarChart(10);
+            //chartView = new QChartView(chartBar);
+            //splitter->addWidget(chartView);
             // устанавливаем круговую диаграмму
             break;
         case 1:
+            //chartBar =  themeWidget->createPieChart();
+            //chartView = new QChartView(chartBar);
+            //splitter->addWidget(chartView);
             // устанавливаем вертикальную диаграмму
             break;
         default:

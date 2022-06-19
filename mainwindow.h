@@ -12,6 +12,8 @@
 #include <QWidget>
 #include <QLabel>
 #include <QMessageBox>
+#include "themewidget.h"
+#include <QSplitter>
 
 class MainWindow : public QWidget//
 {
@@ -33,6 +35,10 @@ private:
     QCheckBox *checkbox;
     QComboBox *combobox;
     QLabel *label, *label_path;
+    ThemeWidget *themeWidget;
+    QChartView *chartView;
+    QChart *chartBar;
+    QSplitter *splitter;
 };
 
 #endif // MAINWINDOW_H
