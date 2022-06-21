@@ -158,6 +158,11 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
     return dataTable;
 }
 
+void ThemeWidget::CreateData(ChartFileDataSqlite datas, QString path){
+    m_dataTable = datas.getData(path);
+}
+
+
 QComboBox *ThemeWidget::createThemeBox() const
 {
     // settings layout

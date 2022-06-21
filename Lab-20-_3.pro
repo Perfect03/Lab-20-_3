@@ -5,10 +5,11 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += sql
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
-
+QT += charts
 CONFIG += c++17
 
 TARGET = LastCase
@@ -30,9 +31,9 @@ SOURCES += \
         main.cpp \
 	mainwindow.cpp \
 	themewidget.cpp \
-    themewidget.cpp
+    chartfiledata.cpp
 
 HEADERS += \
-    fileexplorermodel.h \
+    chartfiledata.h \
         mainwindow.h \
     themewidget.h

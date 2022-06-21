@@ -46,7 +46,7 @@ private:
     QChartView *chartView;
     QChart *chartBar;
     QSplitter *splitter;
-
+    ChartFileDataSqlite chartData;
 };
 
 #endif // MAINWINDOW_H
