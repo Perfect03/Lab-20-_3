@@ -49,7 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     //this->statusBar()->showMessage("Choosen Path: ");
 
     //homePath = QDir::homePath() + "/Desktop/Solomin_Dmitrii_931920_Lab20_3/InputData";
-    homePath = QDir::toNativeSeparators(QCoreApplication::applicationDirPath()) + "/InputData";
+    homePath = QDir::toNativeSeparators(QCoreApplication::applicationDirPath());
     //homePath = QCoreApplication::applicationDirPath();
     // Определим  файловой системы:
     dirModel =  new QFileSystemModel(this);
@@ -255,7 +255,10 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
     }
 
     //tableView->header()->resizeSection(index.column(), length + dirModel->fileName(index).length());
-    treeView->setRootIndex(fileModel->setRootPath(filePath));
+    themeWidget->CreateData(chartData, filePath);
+    chartBar =  themeWidget->createBarChart(5);//createPieChart();
+    chartView = new QChartView(chartBar);
+    splitter->addWidget(chartView);
 }
 
 void MainWindow::on_select_comboboxOnChangedSlot(const int index)
