@@ -8,7 +8,6 @@
 #include <QPair>
 #include <QString>
 #include <QPointF>
-
 #include "chartfiledata.h"
 
 class QComboBox;
@@ -17,10 +16,6 @@ class QCheckBox;
 
 class QChartView;
 class QChart;
-
-typedef QPair<QPointF, QString> Data;
-typedef QList<Data> DataList;
-typedef QList<DataList> DataTable;
 
 class WidgetChart:public QWidget
 {
@@ -48,6 +43,7 @@ private:
     QComboBox *createLegendBox() const;
     void connectSignals();
 public:
+    QChart *createPieChart(DataTable mdataTable);
     void CreateData(ChartFileDataSqlite data, QString path);
     QChart *createAreaChart() const;
     QChart *createBarChart(int valueCount) const;

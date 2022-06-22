@@ -28,7 +28,6 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     m_listCount(3),
     m_valueMax(10),
     m_valueCount(7),
-    m_dataTable(generateRandomData(m_listCount, m_valueMax, m_valueCount)),
     m_themeComboBox(createThemeBox()),
     m_antialiasCheckBox(new QCheckBox("Anti-aliasing")),
     m_animatedComboBox(createAnimationBox()),
@@ -52,7 +51,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
 
     QChartView *chartView;
     chartView = new QChartView(createAreaChart());
-
+/*
    // chartView = new QChartView(createAreaChart());
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
@@ -74,7 +73,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     chartView = new QChartView(createSplineChart());
     baseLayout->addWidget(chartView, 2, 1);
     m_charts << chartView;
-
+*/
     chartView = new QChartView(createScatterChart());
     baseLayout->addWidget(chartView, 2, 2);
     m_charts << chartView;
@@ -211,7 +210,7 @@ QChart *ThemeWidget::createBarChart(int valueCount) const
     for (int i(0); i < m_dataTable.count(); i++) {
         QBarSet *set = new QBarSet("Bar set " + QString::number(i));
         for (const Data &data : m_dataTable[i])
-            *set << data.first.y();
+            *set << data.first.x();
         series->append(set);
     }
     chart->addSeries(series);

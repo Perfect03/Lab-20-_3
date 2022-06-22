@@ -11,6 +11,7 @@
 #include <QStatusBar>
 #include <QDebug>
 #include <QtWidgets/QWidget>
+// библиотеки для построения графиков
 #include <QtCharts/QChartGlobal>
 #include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
@@ -48,13 +49,8 @@ MainWindow::MainWindow(QWidget *parent)
     //this->setStatusBar(new QStatusBar(this));
     //this->statusBar()->showMessage("Choosen Path: ");
 
-    //homePath = QDir::homePath() + "/Documents/Lab-20-_3/Input";
-    homePath = QDir::toNativeSeparators(QCoreApplication::applicationDirPath());
-    //homePath = QCoreApplication::applicationDirPath();
-    // Определим  файловой системы:
-    dirModel =  new QFileSystemModel(this);
-    dirModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs);
-    dirModel->setRootPath(homePath);
+    QString str = PRJ_PATH;
+    homePath = str + "/InputData";
 
     fileModel = new QFileSystemModel(this);
     fileModel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
@@ -64,24 +60,24 @@ MainWindow::MainWindow(QWidget *parent)
     //Показать как дерево, пользуясь готовым видом:
 
 
-    label_path = new QLabel("Choosen Path: ");
-    label_path->setText(homePath);
+    label_path = new QLabel("Choosen Path: "); // надпись с выбранным путём к файлу
+    label_path->setText(homePath); // ставим в неё текст из переменной homePath
 
-    label = new QLabel("Выберите тип диаграммы");
+    label = new QLabel("Выберите тип диаграммы"); // надпись для выбора диаграммы
 
-    combobox = new QComboBox();//выбор графика
+    combobox = new QComboBox();//выпадающий список с выбором графика
     //combobox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
     btnPrint = new QPushButton("Печать графика"); //кнопка печати графика
     //btnPrint->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
-    checkbox = new QCheckBox("Черно-белый график"); // выбор цвета графика
+    checkbox = new QCheckBox("Черно-белый график"); //выпадающий список с выбором цвета графика
     //checkbox->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
-    selectDir = new QPushButton("Выбор папки");
+    selectDir = new QPushButton("Выбор папки"); // кнопка выбора папки
     //selectDir->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
-    QHBoxLayout *layout = new QHBoxLayout();
+    QHBoxLayout *layout = new QHBoxLayout(); // располагаем виджеты в горизонтальный     // компоновщик
     layout->addWidget(label);
     layout->addWidget(combobox);
     layout->addWidget(checkbox);
@@ -95,13 +91,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // заполнять всё доступное пространство по вертикали
 
-    themeWidget = new ThemeWidget();
-
-    treeView = new QTreeView(splitter);
+    treeView = new QTreeView();
     treeView->setModel(dirModel);
     treeView->expandAll();
 
-    tableView = new QTableView(splitter);
+    tableView = new QTableView(splitter); // табличное представление для файловой модели
     tableView->setModel(fileModel);
 
     treeView->setHeaderHidden(true); // скрываем заголовок дерева
@@ -109,13 +103,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     //1.Добавление диаграммы
 
+    //themeWidget = new ThemeWidget(); // виджет для диаграммы
+    //chartView = new QChartView(splitter);
+
     //chartBar =  themeWidget->createPieChart();
-   // chartView = new QChartView(chartBar);
+    //chartView = new QChartView(chartBar); // создаём графики
 
     //splitter->addWidget(chartView);
     //setCentralWidget(splitter);
     splitter->setStretchFactor(0, 1); // устанавливаем начальное положение разделителя
-    splitter->setStretchFactor(1, 2);
+    splitter->setStretchFactor(1, 4);
 
     //splitter->addWidget(treeView);
     //splitter->addWidget(chartView);
@@ -123,7 +120,7 @@ MainWindow::MainWindow(QWidget *parent)
     //setCentralWidget(splitter);
 
 
-    QVBoxLayout *layout_vertical = new QVBoxLayout(this);
+    QVBoxLayout *layout_vertical = new QVBoxLayout(this); // вертикальный компоновщик
     layout_vertical->addLayout(layout);
     layout_vertical->addWidget(splitter);
     layout_vertical->addWidget(label_path);
@@ -136,7 +133,7 @@ MainWindow::MainWindow(QWidget *parent)
     QModelIndex indexHomePath = fileModel->index(homePath);
     QFileInfo fileInfo = fileModel->fileInfo(indexHomePath);
 
-    combobox->addItem("Bar Chart");
+    combobox->addItem("Bar Chart"); // добавляем в список виды диаграмм
     combobox->addItem("Pie Chart");
 
     /* Рассмотрим способы обхода содержимого папок на диске.
@@ -171,12 +168,12 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
 
-    //tableView->header()->resizeSection(0, 200);
     //Выполнение соединения слота и сигнала при выборе элемента в TreeView
     connect(selectionModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_selectionChangedSlot(const QItemSelection &, const QItemSelection &)));
     connect(combobox, &QComboBox::currentIndexChanged, this, &MainWindow::on_select_comboboxOnChangedSlot);// выбор графика
     connect (btnPrint, SIGNAL(clicked()), this, SLOT(on_print_chart_slot())); //печать графика
     connect (selectDir, SIGNAL(clicked()), this, SLOT(on_select_dir_slot())); //выбор папки
+    connect (checkbox, SIGNAL(toggled(bool)), this, SLOT(on_color_chart_slot())); // смена цвета
 
     //Пример организации установки курсора в TableView относительно модельного индекса
     QItemSelection toggleSelection;
@@ -189,6 +186,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     tableView->setRootIndex(fileModel->setRootPath(homePath));
 }
+
+// метод смены цвета диаграммы
+void MainWindow::on_color_chart_slot(){
+
+}
+
+// выбор папки и смена пути
 void MainWindow::on_select_dir_slot()
 {
     QFileDialog dialog(this);
@@ -208,14 +212,14 @@ void MainWindow::on_print_chart_slot()
         homePathSavePdf = dialog.selectedFiles().first();
 
    // tableView->setRootIndex(fileModel->setRootPath(homePath));
-    QPdfWriter writer("file.pdf");
+    QPdfWriter writer(homePathSavePdf + "/" + "grafic.pdf");
 
     writer.setCreator("Author");// Создатель документа
-    //writer.setPageSize(QPageSize::A4);// Устанавливаем размер страницы А4
+    writer.setPageSize(QPageSize::A4);// Устанавливаем размер страницы А4
 
     QPainter painter(&writer);
 
-    //chart_view->render(&painter);
+    chart_view->render(&painter);
     painter.end();
 }
 
@@ -227,7 +231,7 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
     Q_UNUSED(deselected);
     QModelIndex index = tableView->selectionModel()->currentIndex();
     QModelIndexList indexs =  selected.indexes();
-    QString filePath = "";
+    filePath = "";
 
     // Размещаем инфо в statusbar относительно выделенного модельного индекса
 
@@ -259,6 +263,7 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
     chartBar =  themeWidget->createBarChart(5);//createPieChart();
     chartView = new QChartView(chartBar);
     splitter->addWidget(chartView);
+    chartView->setChart(chartBar);
 }
 
 void MainWindow::on_select_comboboxOnChangedSlot(const int index)
@@ -272,19 +277,22 @@ void MainWindow::on_select_comboboxOnChangedSlot(const int index)
             //chartBar =  themeWidget->createBarChart(10);
             //chartView = new QChartView(chartBar);
             //splitter->addWidget(chartView);
+            chartBar =  themeWidget->createBarChart(5); 
+            //createPieChart()
             // устанавливаем круговую диаграмму
             break;
         case 1:
             //chartBar =  themeWidget->createPieChart();
             //chartView = new QChartView(chartBar);
             //splitter->addWidget(chartView);
+            chartBar =  themeWidget->createPieChart();
             // устанавливаем вертикальную диаграмму
             break;
         default:
             throw std::runtime_error("Unknown display type selected."); // такой ситуации быть не должно, по этому сообщаем о ней
             break;
         }
-
+    chartView->setChart(chartBar);
     }
     catch (const std::runtime_error &e)
     {

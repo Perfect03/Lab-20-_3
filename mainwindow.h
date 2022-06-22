@@ -26,11 +26,13 @@ private slots:
     void on_select_comboboxOnChangedSlot(const int index);
     void on_print_chart_slot();
     void on_select_dir_slot();
+    void on_color_chart_slot();
 
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 private:
+    QString filePath;
     QString homePath;
     QString homePathSavePdf;
     QFileSystemModel *fileModel;
@@ -47,6 +49,8 @@ private:
     QChart *chartBar;
     QSplitter *splitter;
     ChartFileDataSqlite chartData;
+    QList <QColor> colorColored;
+    QList <QColor> colorBlack_White;
 };
 
 #endif // MAINWINDOW_H
