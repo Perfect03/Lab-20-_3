@@ -113,8 +113,9 @@ MainWindow::MainWindow(QWidget *parent)
     themeWidget->countChart(countChart);// ограничение на количество столбцов
 
     chartView = new QChartView(splitter);
-    themeWidget->Recolor(colorColored);
-    flag_chart = false; // флаг, определяющий цвет графика
+    
+    themeWidget->Recolor(colorColored); // задаём начальный цвет графика
+    flag_chart = false; // и начальный тип графика
     splitter->setStretchFactor(0, 1); // начальное положение разделителя
     splitter->setStretchFactor(1, 150);
 
@@ -178,7 +179,7 @@ void MainWindow::on_color_chart_slot(){
     else
         themeWidget->Recolor(colorColored);
 
-    on_reDraw();
+    on_reDraw(); // перерисовывание диаграммы при смене цвета
 }
 
 // выбор папки и смена пути
@@ -190,7 +191,7 @@ void MainWindow::on_select_dir_slot()
     {
         homePath = dialog.selectedFiles().first(); // назначаем каталог, выбранный пользователем через проводник
     }
-    tableView->setRootIndex(fileModel->setRootPath(homePath));
+    tableView->setRootIndex(fileModel->setRootPath(homePath)); // также нужно изменить корень таблицы файлов
 }
 
 //Печать графика через QPdfWriter
@@ -199,7 +200,7 @@ void MainWindow::on_print_chart_slot()
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::Directory);
     if (dialog.exec())
-        homePathSavePdf = dialog.selectedFiles().first();
+        homePathSavePdf = dialog.selectedFiles().first(); // назначаем каталог, выбранный пользователем через проводник
 
     QPdfWriter writer(homePathSavePdf + "/" + "file.pdf");
 
@@ -242,7 +243,7 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
 
     }
 
-    if(filePath.endsWith(".sqlite"))
+    if(filePath.endsWith(".sqlite")) // проверка формата файла
     {
         ChartFileDataSqlite sqlite;
         themeWidget->CreateData(sqlite, filePath);
@@ -256,7 +257,7 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
         else
         {
             QMessageBox mes;
-            mes.setText("Формат файла выбран не верно");
+            mes.setText("Формат файла выбран не верно"); // исключение
             mes.exec();
         }
     on_reDraw();
@@ -265,10 +266,10 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
 void MainWindow::on_reDraw(){ // функция для перерисовки цвета графика при смене цвета (без считывания данных)
     if(!flag_chart)
     {
-        chartBar =  themeWidget->createBarChart(10);//createPieChart();
+        chartBar =  themeWidget->createBarChart(10);//рисуем столбчатую диаграмму
     }
     else
-        chartBar =  themeWidget->createPieChart();
+        chartBar =  themeWidget->createPieChart(); // рисуем круглую диаграмму
 
     chartView->setChart(chartBar);
 }

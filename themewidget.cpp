@@ -56,9 +56,9 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createBarChart(m_valueCount));
+   /* chartView = new QChartView(createBarChart(m_valueCount));
     baseLayout->addWidget(chartView, 1, 1);
-    m_charts << chartView;
+    m_charts << chartView;*/
 
     chartView = new QChartView(createLineChart());
     baseLayout->addWidget(chartView, 1, 2);
@@ -127,15 +127,15 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
 }
 
 void ThemeWidget::CreateData(ChartFileData &datas, QString path){
-    m_dataTable = datas.getData(path);
+    m_dataTable = datas.getData(path); // метод для создания переменной данных из файла
 }
 
 void ThemeWidget::Recolor(QList <QColor> color){
-    this->color = color;
+    this->color = color; // изменнеие цвета
 }
 
 void ThemeWidget::countChart(int countChart){
-    this->count_Chart = countChart;
+    this->count_Chart = countChart; // установка количества ячеек графика
 }
 
 
@@ -214,7 +214,7 @@ QChart *ThemeWidget::createBarChart(int valueCount) const
     chart->setTitle("Bar chart");
 
     int count = 0;
-    double chartOther = 0.0;
+    double chartOther = 0.0; // счетчик количества нарисованных ячеек графика
     QBarSeries *series = new QBarSeries(chart);
     qDebug() << "count is " << m_dataTable.count() << "list "<< color.count();
     for (int i(0); i < m_dataTable.count(); i++) {
@@ -222,21 +222,21 @@ QChart *ThemeWidget::createBarChart(int valueCount) const
         {
             if(count < count_Chart - 1){
                 QBarSet *set = new QBarSet(data.second);
-                *set << data.first.x();
+                *set << data.first.x(); // запись данных во все столбцы, кроме последнего
                 set->setBrush(color.at(count));
                 series->append(set);
             }
             else
-                chartOther += data.first.x();
+                chartOther += data.first.x(); // запись остальных данных в последний столбец
 
             count++;
         }
     }
-    //запись остальных элементов в Другие
+    //запись остальных элементов в последнюю ячейку
     if(count > count_Chart){
         QBarSet *set = new QBarSet("Другие");
         *set << chartOther;
-        set->setBrush(color.at(count_Chart - 1));
+        set->setBrush(color.at(count_Chart - 1)); // установка цвета для неё
         series->append(set);
     }
     chart->addSeries(series);
@@ -269,7 +269,7 @@ QChart *ThemeWidget::createPieChart() const
 {
     QChart *chart = new QChart();
     chart->setTitle("Pie chart");
-    int count = 0;
+    int count = 0; // счетчик количества ячеек круговой диаграммы
     double chartOther = 0.0;
     qreal pieSize = 1.0 / m_dataTable.count();
     for (int i = 0; i < m_dataTable.count(); i++) {
@@ -277,20 +277,20 @@ QChart *ThemeWidget::createPieChart() const
         for (const Data &data : m_dataTable[i]) {
             if(count < count_Chart)
             {
-                QPieSlice *slice = series->append(data.second, data.first.x());
+                QPieSlice *slice = series->append(data.second, data.first.x()); // запись данных во все ячейки, кроме последней
                 if (data == m_dataTable[i].first()) {
                     slice->setLabelVisible();
                     slice->setExploded();
                 }
-                slice->setBrush(color.at(count));
+                slice->setBrush(color.at(count)); // задание цвета
             }
-        else chartOther += data.first.x();
+        else chartOther += data.first.x(); // запись данных в последнюю ячейку
             count++;
         }
         //запись остальных элементов в Другие
         if(count > count_Chart){
             QPieSlice *slice = series->append("Другие", chartOther);
-            slice->setBrush(color.at(count_Chart - 1));
+            slice->setBrush(color.at(count_Chart - 1)); // её цвет
         }
         qreal hPos = (pieSize / 2) + (i / (qreal) m_dataTable.count());
         // series->setPieSize(pieSize);
