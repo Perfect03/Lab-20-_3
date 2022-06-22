@@ -17,15 +17,7 @@ class QCheckBox;
 class QChartView;
 class QChart;
 
-class WidgetChart:public QWidget
-{
-    Q_OBJECT
-public:
-    explicit WidgetChart(QWidget *parent = nullptr);
-    ~WidgetChart(){}
 
-
-};
 class ThemeWidget: public QWidget
 {
     Q_OBJECT
