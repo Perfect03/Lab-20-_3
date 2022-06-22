@@ -149,27 +149,15 @@ QChart *ThemeWidget::createBarChart(int valueCount) const
     double chartOther = 0.0; // счетчик количества нарисованных ячеек графика
     QBarSeries *series = new QBarSeries(chart);
     qDebug() << "count is " << m_dataTable.count() << "list "<< color.count();
-    for (int i(0); i < m_dataTable.count(); i++) {
+    for (int i(0); i < m_dataTable.count(); i++) { // цикл по каждой из таблиц данных (мы рассматриваем одну)
         for (const Data &data : m_dataTable[i])
         {
-            if(count < count_Chart - 1){
                 QBarSet *set = new QBarSet(data.second);
-                *set << data.first.x(); // запись данных во все столбцы, кроме последнего
+                *set << data.first.x(); // запись данных в график
                 set->setBrush(color.at(count));
                 series->append(set);
-            }
-            else
-            {chartOther += data.first.x(); }// запись остальных данных в последний столбец
-
             count++;
         }
-    }
-    //запись остальных элементов в последнюю ячейку
-    if(count > count_Chart){
-        QBarSet *set = new QBarSet("Другие");
-        *set << chartOther;
-        set->setBrush(color.at(count_Chart - 1)); // установка цвета для неё
-        series->append(set);
     }
     chart->addSeries(series);
     chart->createDefaultAxes();
@@ -204,25 +192,17 @@ QChart *ThemeWidget::createPieChart() const
     int count = 0; // счетчик количества ячеек круговой диаграммы
     double chartOther = 0.0;
     qreal pieSize = 1.0 / m_dataTable.count(); // эта переменная определяет положение графиков (если он один - то по центру)
-    for (int i = 0; i < m_dataTable.count(); i++) {
+    for (int i = 0; i < m_dataTable.count(); i++) {// цикл по каждой из таблиц данных (мы рассматриваем одну)
         QPieSeries *series = new QPieSeries(chart);
         for (const Data &data : m_dataTable[i]) {
-            if(count < count_Chart)
-            {
-                QPieSlice *slice = series->append(data.second, data.first.x()); // запись данных во все ячейки, кроме последней
+                QPieSlice *slice = series->append(data.second, data.first.x()); // запись данных в график
                 if (data == m_dataTable[i].first()) {
                     slice->setLabelVisible();
                     slice->setExploded();
                 }
                 slice->setBrush(color.at(count)); // задание цвета
-            }
-        else chartOther += data.first.x(); // запись данных в последнюю ячейку
+
             count++;
-        }
-        //запись остальных элементов в Другие
-        if(count > count_Chart){
-            QPieSlice *slice = series->append("Другие", chartOther);
-            slice->setBrush(color.at(count_Chart - 2)); // её цвет
         }
         qreal hPos = (pieSize / 2) + (i / (qreal) m_dataTable.count());
         // series->setPieSize(pieSize);
@@ -232,6 +212,8 @@ QChart *ThemeWidget::createPieChart() const
     }
 
     return chart;
+
+
 }
 
 QChart *ThemeWidget::createSplineChart() const
