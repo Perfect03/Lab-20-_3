@@ -75,8 +75,8 @@ MainWindow::MainWindow(QWidget *parent)
     //selectDir->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 
-    int countChart = 11; // т.к. данных слишком много, и диаграмма получается чрезмерно большой, сокращаем количество секций в графике (10)
-    // в последней секции (11) совместим все остальные секции
+    int countChart = 12; // т.к. данных слишком много, и диаграмма получается чрезмерно большой, сокращаем количество секций в графике (11)
+    // в последней секции (12) совместим все остальные секции
 
     for (int i = 0; i < countChart; i++){
         int R = rand()%250;
@@ -113,7 +113,7 @@ MainWindow::MainWindow(QWidget *parent)
     themeWidget->countChart(countChart);// ограничение на количество столбцов
 
     chartView = new QChartView(splitter);
-    
+
     themeWidget->Recolor(colorColored); // задаём начальный цвет графика
     flag_chart = false; // и начальный тип графика
     splitter->setStretchFactor(0, 1); // начальное положение разделителя
@@ -211,8 +211,9 @@ void MainWindow::on_print_chart_slot()
 
     chartView->render(&painter);
     painter.end();
+
     QMessageBox mes;
-    mes.setText("PDF создан в" + homePathSavePdf);//сообщение о том, что график сохранён в pdf
+    mes.setText("PDF сохранён в " + homePathSavePdf);//сообщение о том, что график сохранён в pdf
     mes.exec();
 }
 

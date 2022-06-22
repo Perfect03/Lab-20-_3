@@ -30,7 +30,6 @@ private Q_SLOTS:
 private:
     QList <QColor> color;
     int count_Chart;
-    DataTable generateRandomData(int listCount, int valueMax, int valueCount) const;
     QComboBox *createThemeBox() const;
     QComboBox *createAnimationBox() const;
     QComboBox *createLegendBox() const;

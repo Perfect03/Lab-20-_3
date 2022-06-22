@@ -6,7 +6,7 @@ DataTable ChartFileDataSqlite::getData (QString path) // получение да
     DataTable data; // данные
     DataList dataList; // таблица данных, на основании которой будем строить график
     int i=0; // счётчик количества считываемых данных из файлов
-    int sizeData = 11;//т.к. база данных может быть большой, сокращаем число элементов
+    int sizeData = 12;//т.к. база данных может быть большой, сокращаем число элементов
     QSqlDatabase dbase = QSqlDatabase::addDatabase("QSQLITE");
     dbase.setDatabaseName(path); // записываем данные из файла
 

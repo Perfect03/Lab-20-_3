@@ -36,45 +36,10 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     connectSignals();
     // create layout
     QGridLayout *baseLayout = new QGridLayout(); // выравнивание по сетке
-    QHBoxLayout *settingsLayout = new QHBoxLayout(); // горизонтальный компоновщик
-    settingsLayout->addWidget(new QLabel("Theme:"));
-    settingsLayout->addWidget(m_themeComboBox);
-    settingsLayout->addWidget(new QLabel("Animation:"));
-    settingsLayout->addWidget(m_animatedComboBox);
-    settingsLayout->addWidget(new QLabel("Legend:"));
-    settingsLayout->addWidget(m_legendComboBox);
-    settingsLayout->addWidget(m_antialiasCheckBox);
-    settingsLayout->addStretch();
-    baseLayout->addLayout(settingsLayout, 0, 0, 1, 3);
 
-    //create charts
-
-    QChartView *chartView;
+    QChartView *chartView; // объявление графиков
     chartView = new QChartView(createAreaChart());
 
-   // chartView = new QChartView(createAreaChart());
-    baseLayout->addWidget(chartView, 1, 0);
-    m_charts << chartView;
-
-    chartView = new QChartView(createBarChart(m_valueCount));
-    baseLayout->addWidget(chartView, 1, 1);
-    m_charts << chartView;
-
-    chartView = new QChartView(createLineChart());
-    baseLayout->addWidget(chartView, 1, 2);
-    m_charts << chartView;
-
-    chartView = new QChartView(createPieChart());
-    chartView->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-    baseLayout->addWidget(chartView, 2, 0);
-    m_charts << chartView;
-
-    chartView = new QChartView(createSplineChart());
-    baseLayout->addWidget(chartView, 2, 1);
-    m_charts << chartView;
-
-    chartView = new QChartView(createScatterChart());
-    baseLayout->addWidget(chartView, 2, 2);
     m_charts << chartView;
 
     setLayout(baseLayout);
@@ -90,41 +55,8 @@ ThemeWidget::~ThemeWidget()
 
 void ThemeWidget::connectSignals()
 {
-    connect(m_themeComboBox,
-            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &ThemeWidget::updateUI);
-    connect(m_antialiasCheckBox, &QCheckBox::toggled, this, &ThemeWidget::updateUI);
-    connect(m_animatedComboBox,
-            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &ThemeWidget::updateUI);
-    connect(m_legendComboBox,
-            static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &ThemeWidget::updateUI);
 }
 
-DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int valueCount) const
-{
-    DataTable dataTable;
-
-    // set seed for random stuff
-    srand(QTime(0, 0, 0).secsTo(QTime::currentTime()));
-
-    // generate random data
-    for (int i(0); i < listCount; i++) {
-        DataList dataList;
-        qreal yValue(0);
-        for (int j(0); j < valueCount; j++) {
-            yValue = yValue + (qreal)(std::rand() % valueMax) / (qreal) valueCount;
-            QPointF value((j + (qreal) rand() / (qreal) RAND_MAX) * ((qreal) m_valueMax / (qreal) valueCount),
-                          yValue);
-            QString label = "Slice " + QString::number(i) + ":" + QString::number(j);
-            dataList << Data(value, label);
-        }
-        dataTable << dataList;
-    }
-
-    return dataTable;
-}
 
 void ThemeWidget::CreateData(ChartFileData &datas, QString path){
     m_dataTable = datas.getData(path); // метод для создания переменной данных из файла
@@ -227,7 +159,7 @@ QChart *ThemeWidget::createBarChart(int valueCount) const
                 series->append(set);
             }
             else
-                chartOther += data.first.x(); // запись остальных данных в последний столбец
+            {chartOther += data.first.x(); }// запись остальных данных в последний столбец
 
             count++;
         }
@@ -271,7 +203,7 @@ QChart *ThemeWidget::createPieChart() const
     chart->setTitle("Pie chart");
     int count = 0; // счетчик количества ячеек круговой диаграммы
     double chartOther = 0.0;
-    qreal pieSize = 1.0 / m_dataTable.count();
+    qreal pieSize = 1.0 / m_dataTable.count(); // эта переменная определяет положение графиков (если он один - то по центру)
     for (int i = 0; i < m_dataTable.count(); i++) {
         QPieSeries *series = new QPieSeries(chart);
         for (const Data &data : m_dataTable[i]) {
@@ -290,7 +222,7 @@ QChart *ThemeWidget::createPieChart() const
         //запись остальных элементов в Другие
         if(count > count_Chart){
             QPieSlice *slice = series->append("Другие", chartOther);
-            slice->setBrush(color.at(count_Chart - 1)); // её цвет
+            slice->setBrush(color.at(count_Chart - 2)); // её цвет
         }
         qreal hPos = (pieSize / 2) + (i / (qreal) m_dataTable.count());
         // series->setPieSize(pieSize);
