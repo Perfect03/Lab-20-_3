@@ -56,9 +56,9 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-   /* chartView = new QChartView(createBarChart(m_valueCount));
+    chartView = new QChartView(createBarChart(m_valueCount));
     baseLayout->addWidget(chartView, 1, 1);
-    m_charts << chartView;*/
+    m_charts << chartView;
 
     chartView = new QChartView(createLineChart());
     baseLayout->addWidget(chartView, 1, 2);

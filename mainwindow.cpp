@@ -211,6 +211,9 @@ void MainWindow::on_print_chart_slot()
 
     chartView->render(&painter);
     painter.end();
+    QMessageBox mes;
+    mes.setText("PDF создан в" + homePathSavePdf);//сообщение о том, что график сохранён в pdf
+    mes.exec();
 }
 
 //Слот для обработки выбора элемента в TableView, выбор осуществляется с помощью курсора
