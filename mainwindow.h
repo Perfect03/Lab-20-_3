@@ -27,6 +27,7 @@ private slots:
     void on_print_chart_slot();
     void on_select_dir_slot();
     void on_color_chart_slot();
+    void on_reDraw();
 
 public:
     MainWindow(QWidget *parent = 0);
@@ -51,6 +52,7 @@ private:
     ChartFileDataSqlite chartData;
     QList <QColor> colorColored;
     QList <QColor> colorBlack_White;
+    bool flag_chart; // для определения типа графика
 };
 
 #endif // MAINWINDOW_H

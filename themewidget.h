@@ -37,6 +37,8 @@ private Q_SLOTS:
     void updateUI();
 
 private:
+    QList <QColor> color;
+    int count_Chart;
     DataTable generateRandomData(int listCount, int valueMax, int valueCount) const;
     QComboBox *createThemeBox() const;
     QComboBox *createAnimationBox() const;
@@ -45,6 +47,8 @@ private:
 public:
     QChart *createPieChart(DataTable mdataTable);
     void CreateData(ChartFileDataSqlite data, QString path);
+    void Recolor(QList <QColor> color);
+    void countChart(int countChart);
     QChart *createAreaChart() const;
     QChart *createBarChart(int valueCount) const;
     QChart *createPieChart() const;

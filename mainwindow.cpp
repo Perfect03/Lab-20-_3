@@ -1,4 +1,4 @@
-﻿#include "mainwindow.h"
+#include "mainwindow.h"
 #include <QSplitter>
 #include <QListView>
 #include <QTreeView>
@@ -77,6 +77,21 @@ MainWindow::MainWindow(QWidget *parent)
     selectDir = new QPushButton("Выбор папки"); // кнопка выбора папки
     //selectDir->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
+
+    int countChart = 11; // т.к. данных слишком много, и диаграмма получается чрезмерно большой, сокращаем количество секций в графике (10)
+    // в последней секции (11) совместим все остальные секции
+
+    for (int i = 0; i < countChart; i++){
+        int R = rand()%250;
+        int G = rand()%250;
+        int B = rand()%250;
+        int BW = (R+G+B)/3;
+        colorColored.push_back(QColor(R,G,B));
+        colorBlack_White.push_back(QColor(BW, BW, BW));
+    }
+
+
+
     QHBoxLayout *layout = new QHBoxLayout(); // располагаем виджеты в горизонтальный     // компоновщик
     layout->addWidget(label);
     layout->addWidget(combobox);
@@ -91,41 +106,25 @@ MainWindow::MainWindow(QWidget *parent)
 
     splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // заполнять всё доступное пространство по вертикали
 
-    treeView = new QTreeView();
-    treeView->setModel(dirModel);
-    treeView->expandAll();
 
     tableView = new QTableView(splitter); // табличное представление для файловой модели
     tableView->setModel(fileModel);
 
-    treeView->setHeaderHidden(true); // скрываем заголовок дерева
-    treeView->hideColumn(1); // также выключаем ненужные столбцы
 
     //1.Добавление диаграммы
+    themeWidget = new ThemeWidget();
+    themeWidget->countChart(countChart);// ограничение на количество столбцов
 
-    //themeWidget = new ThemeWidget(); // виджет для диаграммы
-    //chartView = new QChartView(splitter);
-
-    //chartBar =  themeWidget->createPieChart();
-    //chartView = new QChartView(chartBar); // создаём графики
-
-    //splitter->addWidget(chartView);
-    //setCentralWidget(splitter);
-    splitter->setStretchFactor(0, 1); // устанавливаем начальное положение разделителя
-    splitter->setStretchFactor(1, 4);
-
-    //splitter->addWidget(treeView);
-    //splitter->addWidget(chartView);
-    //splitter->addWidget(tableView);
-    //setCentralWidget(splitter);
-
+    chartView = new QChartView(splitter);
+    themeWidget->Recolor(colorColored);
+    flag_chart = false;
+    splitter->setStretchFactor(0, 1); // начальное положение разделителя
+    splitter->setStretchFactor(1, 150);
 
     QVBoxLayout *layout_vertical = new QVBoxLayout(this); // вертикальный компоновщик
     layout_vertical->addLayout(layout);
     layout_vertical->addWidget(splitter);
     layout_vertical->addWidget(label_path);
-    //layout_vertical->addStretch();
-    //setLayout(layout_vertical);
 
     QItemSelectionModel *selectionModel = tableView->selectionModel();
     QModelIndex rootIx = fileModel->index(0, 0, QModelIndex());//корневой элемент
@@ -168,7 +167,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
 
-    //Выполнение соединения слота и сигнала при выборе элемента в TreeView
+    //Выполнение соединения слота и сигнала при выборе элемента в TableView
     connect(selectionModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_selectionChangedSlot(const QItemSelection &, const QItemSelection &)));
     connect(combobox, &QComboBox::currentIndexChanged, this, &MainWindow::on_select_comboboxOnChangedSlot);// выбор графика
     connect (btnPrint, SIGNAL(clicked()), this, SLOT(on_print_chart_slot())); //печать графика
@@ -181,15 +180,19 @@ MainWindow::MainWindow(QWidget *parent)
     topLeft = fileModel->index(homePath);
     fileModel->setRootPath(homePath);
 
-    toggleSelection.select(topLeft, topLeft);
-    selectionModel->select(toggleSelection, QItemSelectionModel::Toggle);
-
     tableView->setRootIndex(fileModel->setRootPath(homePath));
 }
 
 // метод смены цвета диаграммы
 void MainWindow::on_color_chart_slot(){
+    if (checkbox->checkState())
+    {
+        themeWidget->Recolor(colorBlack_White);
+    }
+    else
+        themeWidget->Recolor(colorColored);
 
+    on_reDraw();
 }
 
 // выбор папки и смена пути
@@ -198,9 +201,10 @@ void MainWindow::on_select_dir_slot()
     QFileDialog dialog(this);
     dialog.setFileMode(QFileDialog::Directory);
     if (dialog.exec())
-        homePath = dialog.selectedFiles().first();;
-
-   tableView->setRootIndex(fileModel->setRootPath(homePath));
+    {
+        homePath = dialog.selectedFiles().first();
+    }
+    tableView->setRootIndex(fileModel->setRootPath(homePath));
 }
 
 //Печать графика через QPdfWriter
@@ -211,7 +215,6 @@ void MainWindow::on_print_chart_slot()
     if (dialog.exec())
         homePathSavePdf = dialog.selectedFiles().first();
 
-   // tableView->setRootIndex(fileModel->setRootPath(homePath));
     QPdfWriter writer(homePathSavePdf + "/" + "grafic.pdf");
 
     writer.setCreator("Author");// Создатель документа
@@ -219,7 +222,7 @@ void MainWindow::on_print_chart_slot()
 
     QPainter painter(&writer);
 
-    chart_view->render(&painter);
+    chartView->render(&painter);
     painter.end();
 }
 
@@ -227,13 +230,13 @@ void MainWindow::on_print_chart_slot()
 
 void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected)
 {
-    //Q_UNUSED(selected);
-    Q_UNUSED(deselected);
+    Q_UNUSED(selected);
+    //Q_UNUSED(deselected);
     QModelIndex index = tableView->selectionModel()->currentIndex();
     QModelIndexList indexs =  selected.indexes();
     filePath = "";
 
-    // Размещаем инфо в statusbar относительно выделенного модельного индекса
+    // Размещаем информацию в label_path относительно выделенного модельного индекса
 
     if (indexs.count() >= 1) {
         QModelIndex ix =  indexs.constFirst();
@@ -260,9 +263,17 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
 
     //tableView->header()->resizeSection(index.column(), length + dirModel->fileName(index).length());
     themeWidget->CreateData(chartData, filePath);
-    chartBar =  themeWidget->createBarChart(5);//createPieChart();
-    chartView = new QChartView(chartBar);
-    splitter->addWidget(chartView);
+    on_reDraw();
+}
+
+void MainWindow::on_reDraw(){
+    if(!flag_chart)
+    {
+        chartBar =  themeWidget->createBarChart(10);//createPieChart();
+    }
+    else
+        chartBar =  themeWidget->createPieChart();
+
     chartView->setChart(chartBar);
 }
 
@@ -274,19 +285,14 @@ void MainWindow::on_select_comboboxOnChangedSlot(const int index)
         switch (index) // получаем из выбранного индекса тип отображения
         {
         case 0:
-            //chartBar =  themeWidget->createBarChart(10);
-            //chartView = new QChartView(chartBar);
-            //splitter->addWidget(chartView);
-            chartBar =  themeWidget->createBarChart(5); 
-            //createPieChart()
-            // устанавливаем круговую диаграмму
+            // устанавливаем вертикальную диаграмму
+            chartBar =  themeWidget->createBarChart(10);
+            flag_chart = false;
             break;
         case 1:
-            //chartBar =  themeWidget->createPieChart();
-            //chartView = new QChartView(chartBar);
-            //splitter->addWidget(chartView);
             chartBar =  themeWidget->createPieChart();
-            // устанавливаем вертикальную диаграмму
+            // устанавливаем круговую диаграмму
+            flag_chart = true;
             break;
         default:
             throw std::runtime_error("Unknown display type selected."); // такой ситуации быть не должно, по этому сообщаем о ней

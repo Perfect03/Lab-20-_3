@@ -51,14 +51,14 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
 
     QChartView *chartView;
     chartView = new QChartView(createAreaChart());
-/*
+
    // chartView = new QChartView(createAreaChart());
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-    chartView = new QChartView(createBarChart(m_valueCount));
+   /* chartView = new QChartView(createBarChart(m_valueCount));
     baseLayout->addWidget(chartView, 1, 1);
-    m_charts << chartView;
+    m_charts << chartView;*/
 
     chartView = new QChartView(createLineChart());
     baseLayout->addWidget(chartView, 1, 2);
@@ -73,7 +73,7 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     chartView = new QChartView(createSplineChart());
     baseLayout->addWidget(chartView, 2, 1);
     m_charts << chartView;
-*/
+
     chartView = new QChartView(createScatterChart());
     baseLayout->addWidget(chartView, 2, 2);
     m_charts << chartView;
@@ -129,6 +129,14 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
 
 void ThemeWidget::CreateData(ChartFileDataSqlite datas, QString path){
     m_dataTable = datas.getData(path);
+}
+
+void ThemeWidget::Recolor(QList <QColor> color){
+    this->color = color;
+}
+
+void ThemeWidget::countChart(int countChart){
+    this->count_Chart = countChart;
 }
 
 
@@ -206,11 +214,30 @@ QChart *ThemeWidget::createBarChart(int valueCount) const
     QChart *chart = new QChart();
     chart->setTitle("Bar chart");
 
-    QStackedBarSeries *series = new QStackedBarSeries(chart);
+    int count = 0;
+    double chartOther = 0.0;
+    QBarSeries *series = new QBarSeries(chart);
+    qDebug() << "count is " << m_dataTable.count() << "list "<< color.count();
     for (int i(0); i < m_dataTable.count(); i++) {
-        QBarSet *set = new QBarSet("Bar set " + QString::number(i));
         for (const Data &data : m_dataTable[i])
-            *set << data.first.x();
+        {
+            if(count < count_Chart - 1){
+                QBarSet *set = new QBarSet(data.second);
+                *set << data.first.x();
+                set->setBrush(color.at(count));
+                series->append(set);
+            }
+            else
+                chartOther += data.first.x();
+
+            count++;
+        }
+    }
+    //запись остальных элементов в Другие
+    if(count > count_Chart){
+        QBarSet *set = new QBarSet("Другие");
+        *set << chartOther;
+        set->setBrush(color.at(count_Chart - 1));
         series->append(set);
     }
     chart->addSeries(series);
@@ -243,19 +270,31 @@ QChart *ThemeWidget::createPieChart() const
 {
     QChart *chart = new QChart();
     chart->setTitle("Pie chart");
-
+    int count = 0;
+    double chartOther = 0.0;
     qreal pieSize = 1.0 / m_dataTable.count();
     for (int i = 0; i < m_dataTable.count(); i++) {
         QPieSeries *series = new QPieSeries(chart);
         for (const Data &data : m_dataTable[i]) {
-            QPieSlice *slice = series->append(data.second, data.first.y());
-            if (data == m_dataTable[i].first()) {
-                slice->setLabelVisible();
-                slice->setExploded();
+            if(count < count_Chart)
+            {
+                QPieSlice *slice = series->append(data.second, data.first.y());
+                if (data == m_dataTable[i].first()) {
+                    slice->setLabelVisible();
+                    slice->setExploded();
+                }
+                slice->setBrush(color.at(count));
             }
+        else chartOther += data.first.x();
+            count++;
+        }
+        //запись остальных элементов в Другие
+        if(count > count_Chart){
+            QPieSlice *slice = series->append("Другие", chartOther);
+            slice->setBrush(color.at(count_Chart - 1));
         }
         qreal hPos = (pieSize / 2) + (i / (qreal) m_dataTable.count());
-        series->setPieSize(pieSize);
+        // series->setPieSize(pieSize);
         series->setHorizontalPosition(hPos);
         series->setVerticalPosition(0.5);
         chart->addSeries(series);

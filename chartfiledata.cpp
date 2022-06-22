@@ -1,28 +1,30 @@
 #include "chartfiledata.h"
 #include <QMessageBox>
 
-DataTable ChartFileDataSqlite::getData (QString path) // получение данных из sql
+DataTable ChartFileDataSqlite::getData (QString path) // РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РёР· sql
 {
-    DataTable data; // данные
-    DataList dataList; // таблица данных, на основании которой будем строить график
-    qreal yValue(0);
+    DataTable data; // РґР°РЅРЅС‹Рµ
+    DataList dataList; // С‚Р°Р±Р»РёС†Р° РґР°РЅРЅС‹С…, РЅР° РѕСЃРЅРѕРІР°РЅРёРё РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµРј СЃС‚СЂРѕРёС‚СЊ РіСЂР°С„РёРє
+    int i=0;
+    int sizeData = 11;//С‚Р°Рє РєР°Рє Р±Р°Р·Р° РґР°РЅРЅС‹С… Р±РѕР»СЊС€Р°СЏ, СЃРѕРєСЂР°С‰Р°РµРј С‡РёСЃР»Рѕ СЌР»РµРјРµРЅС‚РѕРІ
     QSqlDatabase dbase = QSqlDatabase::addDatabase("QSQLITE");
-    dbase.setDatabaseName(path); // записываем данные из файла
+    dbase.setDatabaseName(path); // Р·Р°РїРёСЃС‹РІР°РµРј РґР°РЅРЅС‹Рµ РёР· С„Р°Р№Р»Р°
 
-    if (!dbase.open()) { // исключение
-        QMessageBox msg; // окно с текстом об ошибке
-        msg.setText("База данных не открыта." + path);
-        msg.exec(); // функцией exec отображаем его
+    if (!dbase.open()) { // РёСЃРєР»СЋС‡РµРЅРёРµ
+        QMessageBox msg; // РѕРєРЅРѕ СЃ С‚РµРєСЃС‚РѕРј РѕР± РѕС€РёР±РєРµ
+        msg.setText("Р‘Р°Р·Р° РґР°РЅРЅС‹С… РЅРµ РѕС‚РєСЂС‹С‚Р°." + path);
+        msg.exec(); // С„СѓРЅРєС†РёРµР№ exec РѕС‚РѕР±СЂР°Р¶Р°РµРј РµРіРѕ
     }
 
     else
     {
         QSqlQuery query("SELECT * FROM " + dbase.tables().takeFirst());
-            while (query.next()) { // цикл по элементам БД
-                QString name = query.value(0).toString(); // название элемента
-                QPointF salary(query.value(1).toDouble(),rand()); // рандомное значение, оно не пригодится
-                dataList << Data(salary, name); // запись данных оператором <<
-                qDebug() << "name is " << name << ". salary is " << salary; // текст вывода
+            while (query.next() && i < sizeData) {
+                i++;
+                QString name = query.value(0).toString(); // РЅР°Р·РІР°РЅРёРµ СЌР»РµРјРµРЅС‚Р°
+                QPointF salary(query.value(1).toDouble(),rand()); // СЂР°РЅРґРѕРјРЅРѕРµ Р·РЅР°С‡РµРЅРёРµ, РѕРЅРѕ РЅРµ РїСЂРёРіРѕРґРёС‚СЃСЏ
+                dataList << Data(salary, name); // Р·Р°РїРёСЃСЊ РґР°РЅРЅС‹С… РѕРїРµСЂР°С‚РѕСЂРѕРј <<
+                qDebug() << "name is " << name << ". salary is " << salary; // С‚РµРєСЃС‚ РІС‹РІРѕРґР°
             }
     }
 
@@ -30,27 +32,27 @@ DataTable ChartFileDataSqlite::getData (QString path) // получение данных из sql
    return data;
 }
 
-DataTable ChartFileDataJson::getData(QString path) // получение данных из json
+DataTable ChartFileDataJson::getData(QString path) // РїРѕР»СѓС‡РµРЅРёРµ РґР°РЅРЅС‹С… РёР· json
 {
-    DataTable data; // данные
-    DataList dataList; // таблица данных, на основании которой будем строить график
+    DataTable data; // РґР°РЅРЅС‹Рµ
+    DataList dataList; // С‚Р°Р±Р»РёС†Р° РґР°РЅРЅС‹С…, РЅР° РѕСЃРЅРѕРІР°РЅРёРё РєРѕС‚РѕСЂРѕР№ Р±СѓРґРµРј СЃС‚СЂРѕРёС‚СЊ РіСЂР°С„РёРє
     QString key;
     QFile file;
-    file.setFileName(path); // читаем файл
-    file.open(QIODevice::ReadOnly | QIODevice::Text);// открываем файл на чтение
-    key = file.readAll(); // сначала читаем все элементы
-    file.close(); // и сразу закрываем файл
+    file.setFileName(path); // С‡РёС‚Р°РµРј С„Р°Р№Р»
+    file.open(QIODevice::ReadOnly | QIODevice::Text);// РѕС‚РєСЂС‹РІР°РµРј С„Р°Р№Р» РЅР° С‡С‚РµРЅРёРµ
+    key = file.readAll(); // СЃРЅР°С‡Р°Р»Р° С‡РёС‚Р°РµРј РІСЃРµ СЌР»РµРјРµРЅС‚С‹
+    file.close(); // Рё СЃСЂР°Р·Сѓ Р·Р°РєСЂС‹РІР°РµРј С„Р°Р№Р»
     QJsonDocument doc = QJsonDocument::fromJson(key.toUtf8());
     QJsonObject jsonObject = doc.object();
-    QJsonArray jsonArray = jsonObject["11"].toArray(); // формируем массив объектов
-    foreach (const QJsonValue & value, jsonArray) // и проходим по нему
+    QJsonArray jsonArray = jsonObject["11"].toArray(); // С„РѕСЂРјРёСЂСѓРµРј РјР°СЃСЃРёРІ РѕР±СЉРµРєС‚РѕРІ
+    foreach (const QJsonValue & value, jsonArray) // Рё РїСЂРѕС…РѕРґРёРј РїРѕ РЅРµРјСѓ
     {
-        if (value.isObject()) // если объект существует, считываем данные
+        if (value.isObject()) // РµСЃР»Рё РѕР±СЉРµРєС‚ СЃСѓС‰РµСЃС‚РІСѓРµС‚, СЃС‡РёС‚С‹РІР°РµРј РґР°РЅРЅС‹Рµ
         {
             QJsonObject obj = value.toObject();
             QString name = obj["key"].toString();
             QPointF salary(obj["ID"].toInt(),rand());
-            dataList << Data(salary, name); // запись в таблицу данных
+            dataList << Data(salary, name); // Р·Р°РїРёСЃСЊ РІ С‚Р°Р±Р»РёС†Сѓ РґР°РЅРЅС‹С…
         }
     }
     //std::sort (data.begin(), data.end());
