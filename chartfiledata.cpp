@@ -1,4 +1,4 @@
-#include "chartfiledata.h"
+﻿#include "chartfiledata.h"
 #include <QMessageBox>
 
 DataTable ChartFileDataSqlite::getData (QString path) // получение данных из sql
@@ -44,14 +44,14 @@ DataTable ChartFileDataJson::getData(QString path) // получение дан�
     file.close(); // и сразу закрываем файл
     QJsonDocument doc = QJsonDocument::fromJson(key.toUtf8());
     QJsonObject jsonObject = doc.object();
-    QJsonArray jsonArray = jsonObject["11"].toArray(); // формируем массив объектов
+    QJsonArray jsonArray = jsonObject["test"].toArray(); // формируем массив объектов
     foreach (const QJsonValue & value, jsonArray) // и проходим по нему
     {
         if (value.isObject()) // если объект существует, считываем данные
         {
             QJsonObject obj = value.toObject();
-            QString name = obj["key"].toString();
-            QPointF salary(obj["ID"].toInt(),rand());
+            QString name = obj["name"].toString();
+            QPointF salary(obj["key"].toDouble(),rand());
             dataList << Data(salary, name); // запись в таблицу данных
         }
     }

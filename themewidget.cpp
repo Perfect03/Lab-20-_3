@@ -1,4 +1,4 @@
-#include <QtCharts/QChartView>
+﻿#include <QtCharts/QChartView>
 #include <QtCharts/QPieSeries>
 #include <QtCharts/QPieSlice>
 #include <QtCharts/QAbstractBarSeries>
@@ -35,8 +35,8 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
 {
     connectSignals();
     // create layout
-    QGridLayout *baseLayout = new QGridLayout();
-    QHBoxLayout *settingsLayout = new QHBoxLayout();
+    QGridLayout *baseLayout = new QGridLayout(); // выравнивание по сетке
+    QHBoxLayout *settingsLayout = new QHBoxLayout(); // горизонтальный компоновщик
     settingsLayout->addWidget(new QLabel("Theme:"));
     settingsLayout->addWidget(m_themeComboBox);
     settingsLayout->addWidget(new QLabel("Animation:"));
@@ -56,16 +56,15 @@ ThemeWidget::ThemeWidget(QWidget *parent) :
     baseLayout->addWidget(chartView, 1, 0);
     m_charts << chartView;
 
-   /* chartView = new QChartView(createBarChart(m_valueCount));
+    chartView = new QChartView(createBarChart(m_valueCount));
     baseLayout->addWidget(chartView, 1, 1);
-    m_charts << chartView;*/
+    m_charts << chartView;
 
     chartView = new QChartView(createLineChart());
     baseLayout->addWidget(chartView, 1, 2);
     m_charts << chartView;
 
     chartView = new QChartView(createPieChart());
-    // Funny things happen if the pie slice labels do not fit the screen, so we ignore size policy
     chartView->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     baseLayout->addWidget(chartView, 2, 0);
     m_charts << chartView;
@@ -127,7 +126,7 @@ DataTable ThemeWidget::generateRandomData(int listCount, int valueMax, int value
     return dataTable;
 }
 
-void ThemeWidget::CreateData(ChartFileDataSqlite datas, QString path){
+void ThemeWidget::CreateData(ChartFileData &datas, QString path){
     m_dataTable = datas.getData(path);
 }
 
@@ -278,7 +277,7 @@ QChart *ThemeWidget::createPieChart() const
         for (const Data &data : m_dataTable[i]) {
             if(count < count_Chart)
             {
-                QPieSlice *slice = series->append(data.second, data.first.y());
+                QPieSlice *slice = series->append(data.second, data.first.x());
                 if (data == m_dataTable[i].first()) {
                     slice->setLabelVisible();
                     slice->setExploded();

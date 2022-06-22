@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+﻿#include "mainwindow.h"
 #include <QSplitter>
 #include <QListView>
 #include <QTreeView>
@@ -50,14 +50,11 @@ MainWindow::MainWindow(QWidget *parent)
     //this->statusBar()->showMessage("Choosen Path: ");
 
     QString str = PRJ_PATH;
-    homePath = str + "/InputData";
+    homePath = str + "/InputData"; // путь к папке с базами данных
 
     fileModel = new QFileSystemModel(this);
-    fileModel->setFilter(QDir::NoDotAndDotDot | QDir::Files);
-    fileModel->setRootPath(homePath);
-
-
-    //Показать как дерево, пользуясь готовым видом:
+    fileModel->setFilter(QDir::NoDotAndDotDot | QDir::Files); // при распознавании файлов учитывается, что могут быть точки в названии файла
+    fileModel->setRootPath(homePath); // сохраняем путь к папке в переменную
 
 
     label_path = new QLabel("Choosen Path: "); // надпись с выбранным путём к файлу
@@ -84,31 +81,31 @@ MainWindow::MainWindow(QWidget *parent)
     for (int i = 0; i < countChart; i++){
         int R = rand()%250;
         int G = rand()%250;
-        int B = rand()%250;
+        int B = rand()%250; // задаём цвета ячейки в RGB-формате
         int BW = (R+G+B)/3;
         colorColored.push_back(QColor(R,G,B));
-        colorBlack_White.push_back(QColor(BW, BW, BW));
+        colorBlack_White.push_back(QColor(BW, BW, BW)); // случай для чёрно-белого графика
     }
 
 
 
-    QHBoxLayout *layout = new QHBoxLayout(); // располагаем виджеты в горизонтальный     // компоновщик
+    QHBoxLayout *layout = new QHBoxLayout(); // располагаем виджеты в горизонтальный компоновщик
     layout->addWidget(label);
     layout->addWidget(combobox);
     layout->addWidget(checkbox);
     layout->addWidget(btnPrint);
     layout->addWidget(selectDir);
     //layout->addStretch();
-    layout->setAlignment(Qt::AlignCenter);
+    layout->setAlignment(Qt::AlignCenter); // и располагаем компоновщик по центру
     //setLayout(layout);
 
-    splitter = new QSplitter(parent);
+    splitter = new QSplitter(parent); // разделитель
 
     splitter->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding); // заполнять всё доступное пространство по вертикали
 
 
     tableView = new QTableView(splitter); // табличное представление для файловой модели
-    tableView->setModel(fileModel);
+    tableView->setModel(fileModel); // и располагаем туда файлы из указанной папки с БД
 
 
     //1.Добавление диаграммы
@@ -117,13 +114,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     chartView = new QChartView(splitter);
     themeWidget->Recolor(colorColored);
-    flag_chart = false;
+    flag_chart = false; // флаг, определяющий цвет графика
     splitter->setStretchFactor(0, 1); // начальное положение разделителя
     splitter->setStretchFactor(1, 150);
 
     QVBoxLayout *layout_vertical = new QVBoxLayout(this); // вертикальный компоновщик
     layout_vertical->addLayout(layout);
-    layout_vertical->addWidget(splitter);
+    layout_vertical->addWidget(splitter); // он состоит из 3 элементов
     layout_vertical->addWidget(label_path);
 
     QItemSelectionModel *selectionModel = tableView->selectionModel();
@@ -132,7 +129,7 @@ MainWindow::MainWindow(QWidget *parent)
     QModelIndex indexHomePath = fileModel->index(homePath);
     QFileInfo fileInfo = fileModel->fileInfo(indexHomePath);
 
-    combobox->addItem("Bar Chart"); // добавляем в список виды диаграмм
+    combobox->addItem("Bar Chart"); // добавляем в выпадающий список виды диаграмм
     combobox->addItem("Pie Chart");
 
     /* Рассмотрим способы обхода содержимого папок на диске.
@@ -152,22 +149,15 @@ MainWindow::MainWindow(QWidget *parent)
              * */
 
             foreach (QFileInfo inf, dir.entryInfoList(QDir::Files | QDir::NoDotAndDotDot, QDir::Type)) {
-                qDebug() << inf.fileName() << "---" << inf.size();
+                qDebug() << inf.fileName() << "---" << inf.size(); // в консоль выводим размер каждого файла
             }
 
             dir.cdUp();// выходим из папки
         }
     }
 
-    QDir dir = fileInfo.dir();
 
-    foreach (QFileInfo inf, dir.entryInfoList(QDir::Files | QDir::Dirs | QDir::NoDotAndDotDot, QDir::Type)) {
-
-        qDebug() << inf.fileName() << "---" << inf.size();
-    }
-
-
-    //Выполнение соединения слота и сигнала при выборе элемента в TableView
+    //Выполнение соединения слота и сигнала при выборе файла с данными
     connect(selectionModel, SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(on_selectionChangedSlot(const QItemSelection &, const QItemSelection &)));
     connect(combobox, &QComboBox::currentIndexChanged, this, &MainWindow::on_select_comboboxOnChangedSlot);// выбор графика
     connect (btnPrint, SIGNAL(clicked()), this, SLOT(on_print_chart_slot())); //печать графика
@@ -175,10 +165,6 @@ MainWindow::MainWindow(QWidget *parent)
     connect (checkbox, SIGNAL(toggled(bool)), this, SLOT(on_color_chart_slot())); // смена цвета
 
     //Пример организации установки курсора в TableView относительно модельного индекса
-    QItemSelection toggleSelection;
-    QModelIndex topLeft;
-    topLeft = fileModel->index(homePath);
-    fileModel->setRootPath(homePath);
 
     tableView->setRootIndex(fileModel->setRootPath(homePath));
 }
@@ -202,7 +188,7 @@ void MainWindow::on_select_dir_slot()
     dialog.setFileMode(QFileDialog::Directory);
     if (dialog.exec())
     {
-        homePath = dialog.selectedFiles().first();
+        homePath = dialog.selectedFiles().first(); // назначаем каталог, выбранный пользователем через проводник
     }
     tableView->setRootIndex(fileModel->setRootPath(homePath));
 }
@@ -215,7 +201,7 @@ void MainWindow::on_print_chart_slot()
     if (dialog.exec())
         homePathSavePdf = dialog.selectedFiles().first();
 
-    QPdfWriter writer(homePathSavePdf + "/" + "grafic.pdf");
+    QPdfWriter writer(homePathSavePdf + "/" + "file.pdf");
 
     writer.setCreator("Author");// Создатель документа
     writer.setPageSize(QPageSize::A4);// Устанавливаем размер страницы А4
@@ -245,28 +231,38 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
         //this->statusBar()->showMessage("Выбранный путь : " + dirModel->filePath(indexs.constFirst()));
     }
 
-    //TODO: !!!!!
-    /*
-    Тут простейшая обработка ширины первого столбца относительно длины названия папки.
-    Это для удобства, что бы при выборе папки имя полностью отображалась в  первом столбце.
-    Требуется доработка(переработка).
-    */
+
     int length = 200;
     int dx = 30;
 
     if (fileModel->fileName(index).length() * dx > length) {
-        length = length + fileModel->fileName(index).length() * dx;
+        length = length + fileModel->fileName(index).length() * dx; // ширина столбца устанавливается относительно длины названия папки
         qDebug() << "r = " << index.row() << "c = " << index.column() << fileModel->fileName(index) << fileModel->fileInfo(
                      index).size();
 
     }
 
-    //tableView->header()->resizeSection(index.column(), length + dirModel->fileName(index).length());
-    themeWidget->CreateData(chartData, filePath);
+    if(filePath.endsWith(".sqlite"))
+    {
+        ChartFileDataSqlite sqlite;
+        themeWidget->CreateData(sqlite, filePath);
+    }
+    else
+        if(filePath.endsWith(".json"))
+        {
+            ChartFileDataJson json;
+            themeWidget->CreateData(json, filePath);
+        }
+        else
+        {
+            QMessageBox mes;
+            mes.setText("Формат файла выбран не верно");
+            mes.exec();
+        }
     on_reDraw();
 }
 
-void MainWindow::on_reDraw(){
+void MainWindow::on_reDraw(){ // функция для перерисовки цвета графика при смене цвета (без считывания данных)
     if(!flag_chart)
     {
         chartBar =  themeWidget->createBarChart(10);//createPieChart();
@@ -277,12 +273,13 @@ void MainWindow::on_reDraw(){
     chartView->setChart(chartBar);
 }
 
+// функция, устанавливающая тип графика
 void MainWindow::on_select_comboboxOnChangedSlot(const int index)
 {
     //splitter->deleteLater();
     try
     {
-        switch (index) // получаем из выбранного индекса тип отображения
+        switch (index)
         {
         case 0:
             // устанавливаем вертикальную диаграмму
@@ -295,14 +292,14 @@ void MainWindow::on_select_comboboxOnChangedSlot(const int index)
             flag_chart = true;
             break;
         default:
-            throw std::runtime_error("Unknown display type selected."); // такой ситуации быть не должно, по этому сообщаем о ней
+            throw std::runtime_error("Unknown display type selected."); // исключение, если не выбран ни один из 2-х типов
             break;
         }
     chartView->setChart(chartBar);
     }
-    catch (const std::runtime_error &e)
+    catch (const std::runtime_error &e) // обработка исключения
     {
-        QMessageBox::about(this, "Error", e.what()); // сообщаем что в процессе выбора вида отображения что-то пошло не так
+        QMessageBox::about(this, "Error", e.what()); // сообщаем, что в процессе выбора вида отображения что-то пошло не так
     }
 }
 

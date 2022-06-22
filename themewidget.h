@@ -17,7 +17,6 @@ class QCheckBox;
 class QChartView;
 class QChart;
 
-
 class ThemeWidget: public QWidget
 {
     Q_OBJECT
@@ -38,7 +37,7 @@ private:
     void connectSignals();
 public:
     QChart *createPieChart(DataTable mdataTable);
-    void CreateData(ChartFileDataSqlite data, QString path);
+    void CreateData(ChartFileData &data, QString path);
     void Recolor(QList <QColor> color);
     void countChart(int countChart);
     QChart *createAreaChart() const;

@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include <QMainWindow>
@@ -49,7 +49,6 @@ private:
     QChartView *chartView;
     QChart *chartBar;
     QSplitter *splitter;
-    ChartFileDataSqlite chartData;
     QList <QColor> colorColored;
     QList <QColor> colorBlack_White;
     bool flag_chart; // для определения типа графика
