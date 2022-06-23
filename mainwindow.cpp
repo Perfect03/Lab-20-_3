@@ -75,8 +75,7 @@ MainWindow::MainWindow(QWidget *parent)
     //selectDir->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 
-    int countChart = 12; // т.к. данных слишком много, и диаграмма получается чрезмерно большой, сокращаем количество секций в графике (11)
-    // в последней секции (12) совместим все остальные секции
+    int countChart = 12; // т.к. данных слишком много, и диаграмма получается чрезмерно большой, сокращаем количество секций в графике (12)
 
     for (int i = 0; i < countChart; i++){
         int R = rand()%250;
