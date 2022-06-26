@@ -146,7 +146,7 @@ QChart *ThemeWidget::createBarChart(int valueCount) const
     chart->setTitle("Bar chart");
 
     int count = 0;
-    double chartOther = 0.0; // счетчик количества нарисованных ячеек графика
+    //double chartOther = 0.0; // счетчик количества нарисованных ячеек графика
     QBarSeries *series = new QBarSeries(chart);
     qDebug() << "count is " << m_dataTable.count() << "list "<< color.count();
     for (int i(0); i < m_dataTable.count(); i++) { // цикл по каждой из таблиц данных (мы рассматриваем одну)
@@ -161,6 +161,7 @@ QChart *ThemeWidget::createBarChart(int valueCount) const
     }
     chart->addSeries(series);
     chart->createDefaultAxes();
+    chart->setAnimationOptions(QChart::SeriesAnimations);
 
     return chart;
 }
@@ -190,7 +191,7 @@ QChart *ThemeWidget::createPieChart() const
     QChart *chart = new QChart();
     chart->setTitle("Pie chart");
     int count = 0; // счетчик количества ячеек круговой диаграммы
-    double chartOther = 0.0;
+//    double chartOther = 0.0;
     qreal pieSize = 1.0 / m_dataTable.count(); // эта переменная определяет положение графиков (если он один - то по центру)
     for (int i = 0; i < m_dataTable.count(); i++) {// цикл по каждой из таблиц данных (мы рассматриваем одну)
         QPieSeries *series = new QPieSeries(chart);
@@ -209,6 +210,7 @@ QChart *ThemeWidget::createPieChart() const
         series->setHorizontalPosition(hPos);
         series->setVerticalPosition(0.5);
         chart->addSeries(series);
+        chart->setAnimationOptions(QChart::SeriesAnimations);
     }
 
     return chart;

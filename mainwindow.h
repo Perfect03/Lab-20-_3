@@ -23,11 +23,11 @@ class MainWindow : public QWidget//
 private slots:
 
     void on_selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
-    void on_select_comboboxOnChangedSlot(const int index);
-    void on_print_chart_slot();
-    void on_select_dir_slot();
-    void on_color_chart_slot();
-    void on_reDraw();
+    void on_select_comboboxOnChangedSlot(const int index); // слот, отрабатываемый при изменении типа графика
+    void on_print_chart_slot(); // печать графика
+    void on_select_dir_slot(); // выбор папки для печати
+    void on_color_chart_slot(); // выбор цветности
+    void on_reDraw(); // перерисование графика при изменении цвета
 
 public:
     MainWindow(QWidget *parent = 0);
