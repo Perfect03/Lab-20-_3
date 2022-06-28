@@ -1,6 +1,5 @@
-#ifndef IOC_H
+﻿#ifndef IOC_H
 #define IOC_H
-//
 
 
 #include <functional>
@@ -114,5 +113,7 @@ public:
 };
 
 IOCContainer gContainer;
+
+int IOCContainer::s_typeId = 1; // инициализируем ненулевым значением
 
 #endif // IOC_H
