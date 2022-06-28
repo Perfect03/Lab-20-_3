@@ -1,4 +1,5 @@
-﻿#include "mainwindow.h"
+#include "ioc_container.h"
+#include "mainwindow.h"
 #include <QSplitter>
 #include <QListView>
 #include <QTreeView>
@@ -39,15 +40,9 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QWidget(parent)
-      //QMainWindow(parent)
 {
-    //Устанавливаем размер главного окна
-    //this->resize(1500,500);
-    //this->setGeometry(100, 100, 1500, 500);
     setWindowTitle("Laba3"); // заголовк окна
     resize(1500, 500); // стандартный размер
-    //this->setStatusBar(new QStatusBar(this));
-    //this->statusBar()->showMessage("Choosen Path: ");
 
     QString str = PRJ_PATH;
     homePath = str + "/InputData"; // путь к папке с базами данных
@@ -75,7 +70,7 @@ MainWindow::MainWindow(QWidget *parent)
     //selectDir->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
 
 
-    int countChart = 12; // т.к. данных слишком много, и диаграмма получается чрезмерно большой, сокращаем количество секций в графике (12)
+    countChart = 12; // т.к. данных слишком много, и диаграмма получается чрезмерно большой, сокращаем количество секций в графике (12)
 
     for (int i = 0; i < countChart; i++){
         int R = rand()%250;
@@ -107,14 +102,10 @@ MainWindow::MainWindow(QWidget *parent)
     tableView->setModel(fileModel); // и располагаем туда файлы из указанной папки с БД
 
 
-    //1.Добавление диаграммы
-    themeWidget = new ThemeWidget();
-    themeWidget->countChart(countChart);// ограничение на количество столбцов
-
     chartView = new QChartView(splitter);
 
-    themeWidget->Recolor(colorColored); // задаём начальный цвет графика
-    flag_chart = false; // и начальный тип графика
+    flag_chart = false; // начальный тип графика
+    flag_color = false;// начальный цвет графика
     splitter->setStretchFactor(0, 1); // начальное положение разделителя
     splitter->setStretchFactor(1, 150);
 
@@ -124,7 +115,6 @@ MainWindow::MainWindow(QWidget *parent)
     layout_vertical->addWidget(label_path);
 
     QItemSelectionModel *selectionModel = tableView->selectionModel();
-    QModelIndex rootIx = fileModel->index(0, 0, QModelIndex());//корневой элемент
 
     QModelIndex indexHomePath = fileModel->index(homePath);
     QFileInfo fileInfo = fileModel->fileInfo(indexHomePath);
@@ -173,11 +163,14 @@ MainWindow::MainWindow(QWidget *parent)
 void MainWindow::on_color_chart_slot(){
     if (checkbox->checkState())
     {
-        themeWidget->Recolor(colorBlack_White);
+        chart->reColor(colorBlack_White);
+        flag_color = true;
     }
     else
-        themeWidget->Recolor(colorColored);
-
+    {
+        chart->reColor(colorColored);
+        flag_color = false;
+    }
     on_reDraw(); // перерисовывание диаграммы при смене цвета
 }
 
@@ -245,18 +238,27 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
                      index).size();
 
     }
+    QString type_chart (combobox->currentText()); // определяется тип графика
+     if (type_chart == "Pie Chart"){
+         gContainer.RegisterInstance<IChart, PieChart>(); // регистрируем экземпляр, подставляя аргумент типа графика
+     }
+     else
+     if (type_chart == "Bar Chart")
+     {
+         gContainer.RegisterInstance<IChart, BarChart>();
+     }
+     else { // исключение
+         QMessageBox mes;
+         mes.setText("Тип графика не верный: " + type_chart);
+         mes.exec();
+      }
+
+
 
     if(filePath.endsWith(".sqlite")) // проверка формата файла
-    {
-        ChartFileDataSqlite sqlite;
-        themeWidget->CreateData(sqlite, filePath);
-    }
-    else
-        if(filePath.endsWith(".json"))
-        {
-            ChartFileDataJson json;
-            themeWidget->CreateData(json, filePath);
-        }
+        gContainer.RegisterInstance<ChartFileData, ChartFileDataSqlite>();
+    else if(filePath.endsWith(".json"))
+            gContainer.RegisterInstance<ChartFileData, ChartFileDataJson>();
         else
         {
             QMessageBox mes;
@@ -267,14 +269,15 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
 }
 
 void MainWindow::on_reDraw(){ // функция для перерисовки цвета графика при смене цвета (без считывания данных)
-    if(!flag_chart)
+    chart = gContainer.GetObject<IChart>().get(); //получаем график
+    if(flag_color)
     {
-        chartBar =  themeWidget->createBarChart(10);//рисуем столбчатую диаграмму
+        chart->createChart(gContainer.GetObject<ChartFileData>()->getData(filePath), countChart, colorBlack_White);//рисуем столбчатую диаграмму
     }
     else
-        chartBar =  themeWidget->createPieChart(); // рисуем круглую диаграмму
+        chart->createChart(gContainer.GetObject<ChartFileData>()->getData(filePath), countChart, colorColored); // рисуем круговую диаграмму
 
-    chartView->setChart(chartBar);
+    chartView->setChart(chart->getChart());
 }
 
 // функция, устанавливающая тип графика
@@ -287,11 +290,11 @@ void MainWindow::on_select_comboboxOnChangedSlot(const int index)
         {
         case 0:
             // устанавливаем вертикальную диаграмму
-            chartBar =  themeWidget->createBarChart(10);
+            gContainer.RegisterInstance<IChart, BarChart>();
             flag_chart = false;
             break;
         case 1:
-            chartBar =  themeWidget->createPieChart();
+            gContainer.RegisterInstance<IChart, PieChart>();
             // устанавливаем круговую диаграмму
             flag_chart = true;
             break;
@@ -299,7 +302,7 @@ void MainWindow::on_select_comboboxOnChangedSlot(const int index)
             throw std::runtime_error("Unknown display type selected."); // исключение, если не выбран ни один из 2-х типов
             break;
         }
-    chartView->setChart(chartBar);
+    on_reDraw();
     }
     catch (const std::runtime_error &e) // обработка исключения
     {

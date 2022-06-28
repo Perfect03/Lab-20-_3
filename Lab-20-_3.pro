@@ -26,9 +26,10 @@ SOURCES += \
         main.cpp \
 	mainwindow.cpp \
 	themewidget.cpp \
-    chartfiledata.cpp
+    ichart.cpp
 DEFINES +=PRJ_PATH='\\"$${PWD}\\"'
 HEADERS += \
     chartfiledata.h \
         mainwindow.h \
-    themewidget.h
+        ioc.h \
+    ichart.h
