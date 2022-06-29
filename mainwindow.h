@@ -1,4 +1,4 @@
-#ifndef MAINWINDOW_H
+﻿#ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
 #include "ichart.h"
@@ -45,7 +45,6 @@ private:
     QComboBox *combobox;
     QLabel *label, *label_path;
     QChartView *chartView;
-    QChart *chartBar;
     QSplitter *splitter;
     QList <QColor> colorColored;
     QList <QColor> colorBlack_White;
