@@ -1,4 +1,4 @@
-#include "ioc_container.h"
+﻿#include "ioc_container.h"
 #include "mainwindow.h"
 #include <QSplitter>
 #include <QListView>
@@ -272,10 +272,10 @@ void MainWindow::on_reDraw(){ // функция для перерисовки ц
     chart = gContainer.GetObject<IChart>().get(); //получаем график
     if(flag_color)
     {
-        chart->createChart(gContainer.GetObject<ChartFileData>()->getData(filePath), countChart, colorBlack_White);//рисуем столбчатую диаграмму
+        chart->createChart(gContainer.GetObject<ChartFileData>()->getData(filePath), countChart, colorBlack_White);//рисуем черно-белую диаграмму
     }
     else
-        chart->createChart(gContainer.GetObject<ChartFileData>()->getData(filePath), countChart, colorColored); // рисуем круговую диаграмму
+        chart->createChart(gContainer.GetObject<ChartFileData>()->getData(filePath), countChart, colorColored); // рисуем цветную диаграмму
 
     chartView->setChart(chart->getChart());
 }
@@ -291,12 +291,10 @@ void MainWindow::on_select_comboboxOnChangedSlot(const int index)
         case 0:
             // устанавливаем вертикальную диаграмму
             gContainer.RegisterInstance<IChart, BarChart>();
-            flag_chart = false;
             break;
         case 1:
             gContainer.RegisterInstance<IChart, PieChart>();
             // устанавливаем круговую диаграмму
-            flag_chart = true;
             break;
         default:
             throw std::runtime_error("Unknown display type selected."); // исключение, если не выбран ни один из 2-х типов
