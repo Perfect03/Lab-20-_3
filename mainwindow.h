@@ -48,9 +48,9 @@ private:
     QSplitter *splitter;
     QList <QColor> colorColored;
     QList <QColor> colorBlack_White;
-    bool flag_chart; // для определения типа графика
     bool flag_color; // для определения цвета графика
     int countChart;
 };
+
 
 #endif // MAINWINDOW_H

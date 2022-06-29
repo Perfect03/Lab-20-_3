@@ -104,7 +104,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     chartView = new QChartView(splitter);
 
-    flag_chart = false; // начальный тип графика
     flag_color = false;// начальный цвет графика
     splitter->setStretchFactor(0, 1); // начальное положение разделителя
     splitter->setStretchFactor(1, 150);
@@ -256,9 +255,9 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
 
 
     if(filePath.endsWith(".sqlite")) // проверка формата файла
-        gContainer.RegisterInstance<ChartFileData, ChartFileDataSqlite>();
+        gContainer.RegisterInstance<IChartFileData, ChartFileDataSqlite>();
     else if(filePath.endsWith(".json"))
-            gContainer.RegisterInstance<ChartFileData, ChartFileDataJson>();
+            gContainer.RegisterInstance<IChartFileData, ChartFileDataJson>();
         else
         {
             QMessageBox mes;
@@ -268,14 +267,14 @@ void MainWindow::on_selectionChangedSlot(const QItemSelection &selected, const Q
     on_reDraw();
 }
 
-void MainWindow::on_reDraw(){ // функция для перерисовки цвета графика при смене цвета (без считывания данных)
+void MainWindow::on_reDraw(){ // функция для перерисовки цвета графика при смене цвета
     chart = gContainer.GetObject<IChart>().get(); //получаем график
     if(flag_color)
     {
-        chart->createChart(gContainer.GetObject<ChartFileData>()->getData(filePath), countChart, colorBlack_White);//рисуем черно-белую диаграмму
+        chart->createChart(gContainer.GetObject<IChartFileData>()->getData(filePath), countChart, colorBlack_White);//рисуем черно-белую диаграмму
     }
     else
-        chart->createChart(gContainer.GetObject<ChartFileData>()->getData(filePath), countChart, colorColored); // рисуем цветную диаграмму
+        chart->createChart(gContainer.GetObject<IChartFileData>()->getData(filePath), countChart, colorColored); // рисуем цветную диаграмму
 
     chartView->setChart(chart->getChart());
 }

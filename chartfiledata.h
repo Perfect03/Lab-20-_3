@@ -1,6 +1,7 @@
 #ifndef CHARTFILEDATA_H
 #define CHARTFILEDATA_H
 
+
 #include <QtSql>
 #include <QJsonObject>
 #include <QJsonDocument>
@@ -19,19 +20,19 @@ typedef QList<Data> DataList;
 typedef QList<DataList> DataTable;
 
 
-class ChartFileData
+class IChartFileData
 {
 public:
     virtual DataTable getData(QString path) = 0;
 };
 
-class ChartFileDataSqlite : public ChartFileData
+class ChartFileDataSqlite : public IChartFileData
 {
 public:
     DataTable getData(QString path);
 };
 
-class ChartFileDataJson: public ChartFileData
+class ChartFileDataJson: public IChartFileData
 {
 public:
     DataTable getData(QString path);

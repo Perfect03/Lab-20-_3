@@ -18,9 +18,9 @@
 class IChart // класс-интерфейс для построения графиков различных типов
 {
 public:
-    virtual QChart* getChart() = 0;// метод получения графика
+    virtual QChart* getChart() = 0;//метод получения графика
     virtual void createChart(DataTable data, int count, QList <QColor> color) = 0;// метод построения графика
-    virtual void reColor(QList <QColor>) = 0; // метод смены цвета графика
+    virtual void reColor(QList <QColor>) = 0; //метод смены цвета графика
 };
 
 class BarChart: public IChart // класс-наследник для построения столбчатых графиков
