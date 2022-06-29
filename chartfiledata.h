@@ -1,6 +1,7 @@
 #ifndef CHARTFILEDATA_H
 #define CHARTFILEDATA_H
 
+
 #include <QtSql>
 #include <QJsonObject>
 #include <QJsonDocument>

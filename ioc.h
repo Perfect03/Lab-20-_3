@@ -29,7 +29,7 @@ public:
         virtual ~FactoryBase() =default;
     };
 
-    map<int, shared_ptr<FactoryBase>> factories; // хранения фабрик в контейнере map
+    map<int, shared_ptr<FactoryBase>> factories; // хранение фабрик в контейнере map
 
     template<typename T> class CFactory : public FactoryBase
         {

@@ -52,4 +52,5 @@ private:
     int countChart;
 };
 
+
 #endif // MAINWINDOW_H
