@@ -25,7 +25,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
 	mainwindow.cpp \
-	themewidget.cpp \
+	chartfiledata.cpp \
     ichart.cpp
 DEFINES +=PRJ_PATH='\\"$${PWD}\\"'
 HEADERS += \
