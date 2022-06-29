@@ -28,7 +28,7 @@ void BarChart::reColor(QList <QColor> color)
 {
     int i=0;
     foreach (QBarSet* x, series->barSets()){
-        x->setBrush(color.at(i));
+        x->setBrush(color.at(i)); // закрашиваем график по уже установленным цветам
         i++;
     }
 }
@@ -61,7 +61,7 @@ void PieChart::createChart(DataTable m_dataTable, int count_Chart, QList <QColor
 void PieChart::reColor(QList <QColor> color){
     int i=0;
     foreach (QPieSlice* x, series->slices()){
-        x->setBrush(color.at(i));
+        x->setBrush(color.at(i)); // закрашиваем график по уже установленным цветам
         i++;
     }
 }
