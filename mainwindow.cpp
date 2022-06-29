@@ -1,4 +1,4 @@
-﻿#include "ioc_container.h"
+﻿#include "ioc.h"
 #include "mainwindow.h"
 #include <QSplitter>
 #include <QListView>
@@ -45,7 +45,7 @@ MainWindow::MainWindow(QWidget *parent)
     resize(1500, 500); // стандартный размер
 
     QString str = PRJ_PATH;
-    homePath = str + "/InputData"; // путь к папке с базами данных
+    homePath = str + "/Input"; // путь к папке с базами данных
 
     fileModel = new QFileSystemModel(this);
     fileModel->setFilter(QDir::NoDotAndDotDot | QDir::Files); // при распознавании файлов учитывается, что могут быть точки в названии файла
